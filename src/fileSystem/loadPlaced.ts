@@ -2,6 +2,10 @@ import { GetPlaceItems } from 'jsx-params';
 import { ImageFullNames, ErrorParam } from 'jsx-recived';
 import { SendHostScript } from './connect';
 
+/**
+ * load placed items on Illustrator document.
+ * @returns {ImageFullNames|ErrorParam}
+ */
 export const loadPlacedItemsFromJSX:()=>Promise<ImageFullNames|ErrorParam> = async () => {
   const connectJsx = new SendHostScript();
   const o = await connectJsx.callHostScript<GetPlaceItems, ImageFullNames|ErrorParam>({
@@ -10,6 +14,10 @@ export const loadPlacedItemsFromJSX:()=>Promise<ImageFullNames|ErrorParam> = asy
   return o;
 };
 
+/**
+ * load status of active document.
+ * @returns {ImageFullNames|false}
+ */
 export const loadCurrentStatus:()=>Promise<ImageFullNames|false> = async () => {
     const status = await loadPlacedItemsFromJSX();
     if (status.status === 'error') {
@@ -18,4 +26,4 @@ export const loadCurrentStatus:()=>Promise<ImageFullNames|false> = async () => {
     } else {
       return status;
     }
-}
+};

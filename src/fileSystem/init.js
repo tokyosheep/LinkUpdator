@@ -45,8 +45,8 @@ export const alertFromJSX = msg => {
 
 export const switchPreview = () => {
     return new Promise(resolve => {
-        csInterface.evalScript(`switchPreview()`,() => {
+        csInterface.evalScript(`switchPreview(${JSON.stringify({isDebug: ISDEBUG})})`,() => {
             resolve();
         });
     })
-}
+};

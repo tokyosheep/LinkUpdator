@@ -949,9 +949,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var watcher = new _watchImages__WEBPACK_IMPORTED_MODULE_7__.Watchacher();
+var watcher = new _watchImages__WEBPACK_IMPORTED_MODULE_7__.Watcher();
+
+/**
+ *
+ *
+ * @param {HomeDirectoryReplacer} replacer 
+ * @return {Promise<void>} 
+ * the function updates watch and document status.
+ * 
+ */
 var checkUpdateImages = /*#__PURE__*/function () {
-  var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee() {
+  var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee(replacer) {
     var status;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
@@ -961,55 +970,141 @@ var checkUpdateImages = /*#__PURE__*/function () {
           return (0,_fileSystem_loadPlaced__WEBPACK_IMPORTED_MODULE_4__.loadCurrentStatus)();
         case 3:
           status = _context.sent;
+          // parse Path string. ExtendScript and Node.js differently deals with directory path.
+          if (status) {
+            status.param.doc = replacer.replaceHomeDirectory(status.param.doc);
+            status.param.placeFullNames = status.param.placeFullNames.map(function (name) {
+              return replacer.replaceHomeDirectory(name);
+            });
+          }
+          //if document unsaved any directory, it stops to inspect anymore.
           if (!(!status || !fs__WEBPACK_IMPORTED_MODULE_2___default().existsSync((0,_fileSystem_resolveFile__WEBPACK_IMPORTED_MODULE_6__.analyzeJSXPath)(status.param.doc)))) {
-            _context.next = 6;
+            _context.next = 7;
             break;
           }
           return _context.abrupt("return");
-        case 6:
+        case 7:
           _context.t0 = status.param !== null;
           if (!_context.t0) {
-            _context.next = 11;
+            _context.next = 12;
             break;
           }
-          _context.next = 10;
+          _context.next = 11;
           return (0,_fileSystem_checkUpdate__WEBPACK_IMPORTED_MODULE_5__.updateCheck)(status.param);
-        case 10:
-          _context.t0 = _context.sent;
         case 11:
+          _context.t0 = _context.sent;
+        case 12:
           if (!_context.t0) {
-            _context.next = 15;
+            _context.next = 16;
             break;
           }
           (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.alertFromJSX)('ドキュメント保存後に更新された画像があります。');
-          _context.next = 15;
+          _context.next = 16;
           return (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.switchPreview)();
-        case 15:
+        case 16:
+          //if the Panel detected unlinked image, it warns.
+          if (status.param !== null && status.param.hasUnlinked) {
+            (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.alertFromJSX)('リンクの外れた画像があります。');
+          }
+          //begin to watch placed images.
           if (status.param !== null) {
             watcher.beginWatch(status.param.doc, status.param.placeFullNames);
           }
-        case 16:
+        case 18:
         case "end":
           return _context.stop();
       }
     }, _callee);
   }));
-  return function checkUpdateImages() {
+  return function checkUpdateImages(_x) {
     return _ref.apply(this, arguments);
   };
 }();
-var DocumentEvent = function DocumentEvent() {
-  (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.init)();
-  _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterActivate', checkUpdateImages);
-  _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('com.adobe.csxs.events.WindowVisibilityChanged', function (e) {
-    if (!e.data) {
-      watcher.stopWatch();
-      _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.removeEventListener('documentAfterActivate', checkUpdateImages);
-    } else {
-      _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterActivate', checkUpdateImages);
-    }
-  });
-};
+var afterSavingUpdate = /*#__PURE__*/function () {
+  var _ref2 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee2(replacer) {
+    var status;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          _context2.next = 2;
+          return (0,_fileSystem_loadPlaced__WEBPACK_IMPORTED_MODULE_4__.loadCurrentStatus)();
+        case 2:
+          status = _context2.sent;
+          console.log('saved status');
+          if (status) {
+            _context2.next = 6;
+            break;
+          }
+          return _context2.abrupt("return");
+        case 6:
+          console.log('saved update', status);
+          _context2.next = 9;
+          return watcher.reSetImages(status.param.placeFullNames.map(function (img) {
+            return replacer.replaceHomeDirectory(img);
+          }));
+        case 9:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2);
+  }));
+  return function afterSavingUpdate(_x2) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+/**
+ * 
+ * @param {HomeDirectoryReplacer} replacer
+ * set event at the beginning open the panel.
+ * after panel's visibility, it adds event.
+ * after panel's invisibility, it removes event. 
+ */
+var DocumentEvent = /*#__PURE__*/function () {
+  var _ref3 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee3(replacer) {
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.next = 2;
+          return (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.init)();
+        case 2:
+          _context3.next = 4;
+          return replacer.setHomeDirectory();
+        case 4:
+          _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterSave', function () {
+            return afterSavingUpdate(replacer);
+          });
+          _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterActivate', function () {
+            return checkUpdateImages(replacer);
+          });
+          _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('com.adobe.csxs.events.WindowVisibilityChanged', function (e) {
+            if (!e.data) {
+              watcher.stopWatch();
+              _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.removeEventListener('documentAfterActivate', function () {
+                return checkUpdateImages(replacer);
+              });
+              _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterSave', function () {
+                return afterSavingUpdate(replacer);
+              });
+            } else {
+              _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterActivate', function () {
+                return checkUpdateImages(replacer);
+              });
+              _fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.csInterface.addEventListener('documentAfterSave', function () {
+                return afterSavingUpdate(replacer);
+              });
+            }
+          });
+        case 7:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3);
+  }));
+  return function DocumentEvent(_x3) {
+    return _ref3.apply(this, arguments);
+  };
+}();
 
 /***/ }),
 
@@ -1022,7 +1117,7 @@ var DocumentEvent = function DocumentEvent() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Watchacher": () => (/* binding */ Watchacher)
+/* harmony export */   "Watcher": () => (/* binding */ Watcher)
 /* harmony export */ });
 /* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ "./node_modules/@babel/runtime/helpers/asyncToGenerator.js");
 /* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -1045,9 +1140,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var Watchacher = /*#__PURE__*/function () {
-  function Watchacher() {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Watchacher);
+var Watcher = /*#__PURE__*/function () {
+  function Watcher() {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Watcher);
     _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "activeDoc", void 0);
     _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "images", void 0);
     _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "watcher", void 0);
@@ -1055,10 +1150,9 @@ var Watchacher = /*#__PURE__*/function () {
     this.images = [];
     this.watcher = null;
   }
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Watchacher, [{
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Watcher, [{
     key: "beginWatch",
     value: function beginWatch(doc, images) {
-      console.log(images);
       this.images = images.map(function (img) {
         return (0,_fileSystem_resolveFile__WEBPACK_IMPORTED_MODULE_6__.analyzeJSXPath)(img);
       });
@@ -1068,7 +1162,6 @@ var Watchacher = /*#__PURE__*/function () {
         ignoreInitial: true,
         depth: 1
       });
-      console.log(this.watcher);
       this.watcher.on('ready', function () {
         return console.log('ready');
       }).on('change', /*#__PURE__*/function () {
@@ -1077,13 +1170,11 @@ var Watchacher = /*#__PURE__*/function () {
             while (1) switch (_context.prev = _context.next) {
               case 0:
                 console.log('changed');
-                //alert detecting update of image.
+                // alert detecting update of image.
+                // await alertFromJSX('画像が更新されました。');
                 _context.next = 3;
-                return (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_7__.alertFromJSX)("".concat(watchedPath, "\u304C\u66F4\u65B0\u3055\u308C\u307E\u3057\u305F\u3002"));
-              case 3:
-                _context.next = 5;
                 return (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_7__.switchPreview)();
-              case 5:
+              case 3:
               case "end":
                 return _context.stop();
             }
@@ -1138,8 +1229,18 @@ var Watchacher = /*#__PURE__*/function () {
       }
       return stopWatch;
     }()
+  }, {
+    key: "reSetImages",
+    value: function reSetImages(newImages) {
+      if (this.watcher === null) return;
+      this.watcher.unwatch(this.images);
+      console.log('before replace', this.watcher);
+      this.images = newImages;
+      this.watcher.add(this.images);
+      console.log('after placed', this.watcher);
+    }
   }]);
-  return Watchacher;
+  return Watcher;
 }();
 
 /***/ }),
@@ -1161,8 +1262,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! fs */ "fs");
 /* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _resolveFile__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./resolveFile */ "./src/fileSystem/resolveFile.ts");
-
 
 
 
@@ -1189,24 +1288,26 @@ var getUpdateTime = /*#__PURE__*/function () {
 }();
 var updateCheck = /*#__PURE__*/function () {
   var _ref3 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee3(_ref2) {
-    var doc, placeFullNames, docFullName, documentDate, filePathDates, flag;
+    var doc, placeFullNames, documentDate, names, filePathDates, flag;
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
           doc = _ref2.doc, placeFullNames = _ref2.placeFullNames;
-          docFullName = (0,_resolveFile__WEBPACK_IMPORTED_MODULE_3__.analyzeJSXPath)(doc);
-          _context3.next = 4;
-          return getUpdateTime(docFullName);
-        case 4:
+          _context3.next = 3;
+          return getUpdateTime(doc);
+        case 3:
           documentDate = _context3.sent;
+          names = placeFullNames.filter(function (name) {
+            return fs__WEBPACK_IMPORTED_MODULE_2___default().existsSync(name);
+          });
           _context3.next = 7;
-          return Promise.all(placeFullNames.map( /*#__PURE__*/function () {
+          return Promise.all(names.map( /*#__PURE__*/function () {
             var _ref4 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee2(fileNamePath) {
               return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee2$(_context2) {
                 while (1) switch (_context2.prev = _context2.next) {
                   case 0:
                     _context2.next = 2;
-                    return getUpdateTime((0,_resolveFile__WEBPACK_IMPORTED_MODULE_3__.analyzeJSXPath)(fileNamePath));
+                    return getUpdateTime(fileNamePath);
                   case 2:
                     return _context2.abrupt("return", _context2.sent);
                   case 3:
@@ -1308,6 +1409,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+/**
+ * load placed items on Illustrator document.
+ * @returns {ImageFullNames|ErrorParam}
+ */
 var loadPlacedItemsFromJSX = /*#__PURE__*/function () {
   var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee() {
     var connectJsx, o;
@@ -1332,6 +1438,11 @@ var loadPlacedItemsFromJSX = /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }();
+
+/**
+ * load status of active document.
+ * @returns {ImageFullNames|false}
+ */
 var loadCurrentStatus = /*#__PURE__*/function () {
   var _ref2 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee2() {
     var status;
@@ -1372,30 +1483,44 @@ var loadCurrentStatus = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "HomeDirectoryReplacer": () => (/* binding */ HomeDirectoryReplacer),
 /* harmony export */   "analyzeJSXPath": () => (/* binding */ analyzeJSXPath),
+/* harmony export */   "dirDesktop": () => (/* binding */ dirDesktop),
+/* harmony export */   "dirMyDocuments": () => (/* binding */ dirMyDocuments),
+/* harmony export */   "getJSXHomeDirectory": () => (/* binding */ getJSXHomeDirectory),
 /* harmony export */   "isDirectory": () => (/* binding */ isDirectory),
 /* harmony export */   "replaceDesktop": () => (/* binding */ replaceDesktop),
 /* harmony export */   "resolveFilePath": () => (/* binding */ resolveFilePath)
 /* harmony export */ });
-/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ "./node_modules/@babel/runtime/helpers/asyncToGenerator.js");
-/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! path */ "path");
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! fs */ "fs");
-/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _init__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./init */ "./src/fileSystem/init.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/defineProperty */ "./node_modules/@babel/runtime/helpers/defineProperty.js");
+/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ "./node_modules/@babel/runtime/helpers/asyncToGenerator.js");
+/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! path */ "path");
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _init__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./init */ "./src/fileSystem/init.js");
+
+
+
 
 
 
 
 
 var dirHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-var dirDesktop = path__WEBPACK_IMPORTED_MODULE_2___default().join(dirHome, 'Desktop');
+var dirDesktop = path__WEBPACK_IMPORTED_MODULE_5___default().join(dirHome, 'Desktop');
+var dirMyDocuments = path__WEBPACK_IMPORTED_MODULE_5___default().join(dirHome, 'Documents');
 var isWin = process.platform === 'win32';
 var resolveFilePath = function resolveFilePath(filePath) {
-  return isWin ? path__WEBPACK_IMPORTED_MODULE_2___default().normalize(filePath) : filePath;
+  return isWin ? path__WEBPACK_IMPORTED_MODULE_5___default().normalize(filePath) : filePath;
 };
 var replaceDesktop = function replaceDesktop(filePath) {
   return filePath.replace(/^~\/Desktop/, dirDesktop);
@@ -1404,14 +1529,14 @@ var analyzeJSXPath = function analyzeJSXPath(filePath) {
   return resolveFilePath(replaceDesktop(filePath));
 };
 var isDirectory = /*#__PURE__*/function () {
-  var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee(filePath) {
+  var _ref = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_3___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default().mark(function _callee(filePath) {
     var stat;
-    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee$(_context) {
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
           _context.next = 3;
-          return fs__WEBPACK_IMPORTED_MODULE_3___default().promises.stat(filePath);
+          return fs__WEBPACK_IMPORTED_MODULE_6___default().promises.stat(filePath);
         case 3:
           stat = _context.sent;
           if (stat.isDirectory()) {
@@ -1419,7 +1544,7 @@ var isDirectory = /*#__PURE__*/function () {
             break;
           }
           _context.next = 7;
-          return (0,_init__WEBPACK_IMPORTED_MODULE_4__.alertFromJSX)('drop the folder');
+          return (0,_init__WEBPACK_IMPORTED_MODULE_7__.alertFromJSX)('drop the folder');
         case 7:
           return _context.abrupt("return", false);
         case 10:
@@ -1442,6 +1567,72 @@ var isDirectory = /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }();
+var getJSXHomeDirectory = function getJSXHomeDirectory() {
+  return new Promise(function (resolve) {
+    _init__WEBPACK_IMPORTED_MODULE_7__.csInterface.evalScript("getHomeDirectoryPath()", function (o) {
+      console.log(o);
+      resolve(JSON.parse(o));
+    });
+  });
+};
+var HomeDirectoryReplacer = /*#__PURE__*/function () {
+  function HomeDirectoryReplacer() {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, HomeDirectoryReplacer);
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default()(this, "desktopPath", void 0);
+    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_2___default()(this, "myDocuments", void 0);
+    this.desktopPath = '^~\/Desktop';
+    this.myDocuments = '~/Documents';
+  }
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(HomeDirectoryReplacer, [{
+    key: "setHomeDirectory",
+    value: function () {
+      var _setHomeDirectory = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_3___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default().mark(function _callee2() {
+        var obj;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_4___default().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return getJSXHomeDirectory();
+            case 2:
+              obj = _context2.sent;
+              if (!(obj.status === 'success')) {
+                _context2.next = 8;
+                break;
+              }
+              this.desktopPath = obj.param.desktop;
+              this.myDocuments = obj.param.myDocuments;
+              _context2.next = 10;
+              break;
+            case 8:
+              _context2.next = 10;
+              return (0,_init__WEBPACK_IMPORTED_MODULE_7__.alertFromJSX)('ホームディレクトリーパスが読み込めませんでした。Extensionがうまく動かない可能性があります。');
+            case 10:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, this);
+      }));
+      function setHomeDirectory() {
+        return _setHomeDirectory.apply(this, arguments);
+      }
+      return setHomeDirectory;
+    }()
+  }, {
+    key: "replaceHomeDirectory",
+    value: function replaceHomeDirectory(filePath) {
+      console.log('filepath directory', filePath);
+      if (filePath.includes(this.desktopPath)) {
+        filePath = filePath.replace(new RegExp("^".concat(this.desktopPath)), dirDesktop);
+      }
+      if (filePath.includes(this.myDocuments)) {
+        filePath = filePath.replace(new RegExp("^".concat(this.myDocuments)), dirMyDocuments);
+      }
+      return resolveFilePath(filePath);
+    }
+  }]);
+  return HomeDirectoryReplacer;
+}();
+;
 
 /***/ }),
 
@@ -1456,23 +1647,42 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Layout": () => (/* binding */ Layout)
 /* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _event_documentEvent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../event/documentEvent */ "./src/event/documentEvent.ts");
-/* harmony import */ var _styles_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../styles/container */ "./src/styles/container.ts");
-/* harmony import */ var _components_header_header__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/header/header */ "./src/components/header/header.tsx");
-/* harmony import */ var _components_main_main__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/main/main */ "./src/components/main/main.tsx");
+/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/asyncToGenerator */ "./node_modules/@babel/runtime/helpers/asyncToGenerator.js");
+/* harmony import */ var _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _event_documentEvent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../event/documentEvent */ "./src/event/documentEvent.ts");
+/* harmony import */ var _fileSystem_resolveFile__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../fileSystem/resolveFile */ "./src/fileSystem/resolveFile.ts");
+/* harmony import */ var _styles_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../styles/container */ "./src/styles/container.ts");
+/* harmony import */ var _components_header_header__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../components/header/header */ "./src/components/header/header.tsx");
+/* harmony import */ var _components_main_main__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../components/main/main */ "./src/components/main/main.tsx");
 
 
 
-var Container = _styles_container__WEBPACK_IMPORTED_MODULE_2__.MainPageContainer.Container;
+
+
+
+var Container = _styles_container__WEBPACK_IMPORTED_MODULE_5__.MainPageContainer.Container;
 
 
 var Layout = function Layout() {
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(function () {
-    (0,_event_documentEvent__WEBPACK_IMPORTED_MODULE_1__.DocumentEvent)();
-  }, []);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(Container, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_header_header__WEBPACK_IMPORTED_MODULE_3__.Header, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_main_main__WEBPACK_IMPORTED_MODULE_4__.MainContent, null));
+  (0,react__WEBPACK_IMPORTED_MODULE_2__.useMemo)( /*#__PURE__*/_babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee() {
+    var replacer;
+    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee$(_context) {
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          replacer = new _fileSystem_resolveFile__WEBPACK_IMPORTED_MODULE_4__.HomeDirectoryReplacer();
+          _context.next = 3;
+          return (0,_event_documentEvent__WEBPACK_IMPORTED_MODULE_3__.DocumentEvent)(replacer);
+        case 3:
+        case "end":
+          return _context.stop();
+      }
+    }, _callee);
+  })), []);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(Container, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_header_header__WEBPACK_IMPORTED_MODULE_6__.Header, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_2___default().createElement(_components_main_main__WEBPACK_IMPORTED_MODULE_7__.MainContent, null));
 };
 
 /***/ }),
@@ -44097,11 +44307,11 @@ const alertFromJSX = msg => {
 
 const switchPreview = () => {
     return new Promise(resolve => {
-        csInterface.evalScript(`switchPreview()`,() => {
+        csInterface.evalScript(`switchPreview(${JSON.stringify({isDebug: true})})`,() => {
             resolve();
         });
     })
-}
+};
 
 /***/ }),
 

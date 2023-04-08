@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { analyzeJSXPath } from './resolveFile';
 import { ImageFullNames } from 'jsx-recived';
 
 const getUpdateTime:(filePath:string)=>Promise<Date> = async filePath => {
@@ -11,10 +10,10 @@ export const updateCheck = async ({
     doc,
     placeFullNames
 }: ImageFullNames['param']):Promise<boolean> => {
-    const docFullName = analyzeJSXPath(doc);
-    const documentDate = await getUpdateTime(docFullName);
-    const filePathDates = await Promise.all(placeFullNames.map(async (fileNamePath) => {
-        return await getUpdateTime(analyzeJSXPath(fileNamePath));
+    const documentDate = await getUpdateTime(doc);
+    const names = placeFullNames.filter(name => fs.existsSync(name));
+    const filePathDates = await Promise.all(names.map(async (fileNamePath) => {
+        return await getUpdateTime(fileNamePath);
     }))
     const flag = filePathDates.some(fileDate => {
         console.log(fileDate);

@@ -19,6 +19,7 @@ declare module 'jsx-recived' {
 
     export type ImageFullNames = SuccessParam<{
         placeFullNames: string[],
-        doc: string
+        doc: string,
+        hasUnlinked: boolean
     }>;
 }
