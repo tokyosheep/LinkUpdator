@@ -37,7 +37,11 @@ const checkUpdateImages:(replacer:HomeDirectoryReplacer)=>Promise<void> = async(
     }
     //begin to watch placed images.
     if(status.param !== null) {
-        watcher.beginWatch(status.param.doc, status.param.placeFullNames);
+        try {
+            watcher.beginWatch(status.param.doc, status.param.placeFullNames);
+        } catch (e) {
+            console.log(e);
+        }
     }
 };
 

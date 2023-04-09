@@ -1008,7 +1008,11 @@ var checkUpdateImages = /*#__PURE__*/function () {
           }
           //begin to watch placed images.
           if (status.param !== null) {
-            watcher.beginWatch(status.param.doc, status.param.placeFullNames);
+            try {
+              watcher.beginWatch(status.param.doc, status.param.placeFullNames);
+            } catch (e) {
+              console.log(e);
+            }
           }
         case 18:
         case "end":
