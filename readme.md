@@ -18,7 +18,7 @@ this makes serious problem someitme. because placed Image keeps old status on Il
 ### This Extension dectecs update and makes saveable status.
 
 Extension detects update of placed Image and automatically , makes saveable the document.
-to be able to save , it needs editing or changing but just updating image, I suppose you wouldn't want to do anything to edit. but just switcing preview mode, Illustrator detects as a something change , and you can save docuemnt. that why after detecting update, Extension just switchs preview mode twice. so it looks no change at all but it makes saveable status.
+to be able to save , it needs editing or changing but just updating image, I suppose you wouldn't want to do anything to edit. but just switcing preview mode, Illustrator detects as a something change , and you can save docuemnt. that why after detecting update, Extension just switchs preview mode twice. so it looks no change at all but it makes saveable.
 
 ### How detects update
 
@@ -32,8 +32,12 @@ this is developed on webpack and few differences between development mode and pr
 after detecting update of image, it alerts under development mode.
 under production mode, it won't alert just switching preview mode.
 
+when you switch the active document, it loads placed image list and also inspects update time.
+if placed image'update time newer than document's time, it alerts and makes saveable the document.
+
 ### Note
 I tested several times but any case of accident , I can't have resposibility.
 please carefully use it in case you deal with your precious document.
+this is still kind of beta version.
 
 ![capture](./readmeImg/linkupdator.gif)
