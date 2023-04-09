@@ -3,18 +3,15 @@ import { analyzeJSXPath } from '../fileSystem/resolveFile';
 import { alertFromJSX, switchPreview } from '../fileSystem/init';
 
 export class Watcher {
-    private activeDoc: string|null;
     private images: string[];
     private watcher:chokidar.FSWatcher|null;
     constructor () {
-        this.activeDoc = null;
         this.images = [];
         this.watcher = null;
     }
 
-    beginWatch (doc:string, images:string[]) {
+    beginWatch (images:string[]) {
         this.images = images.map(img => analyzeJSXPath(img));
-        this.activeDoc = doc;
         console.log(chokidar);
         this.watcher = chokidar.watch(this.images, {
           persistent: true,

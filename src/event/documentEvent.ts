@@ -32,25 +32,31 @@ const checkUpdateImages:(replacer:HomeDirectoryReplacer)=>Promise<void> = async(
           alertFromJSX('ドキュメント保存後に更新された画像があります。');
           await switchPreview();
       }
-      //if the Panel detected unlinked image, it warns.
-      if (status.param !== null && status.param.hasUnlinked) {
-          alertFromJSX('リンクの外れた画像があります。');
-      }
       //begin to watch placed images.
       if(status.param !== null) {
           console.log('begin');
-          watcher.beginWatch(status.param.doc, status.param.placeFullNames);
+          watcher.beginWatch(status.param.placeFullNames);
       }
+      console.log(status.param !== null);
     } catch (e) {
         console.log('error update function');
         console.log(e);
     }
 };
 
+/**
+ * after saving document, update replaced items list
+ * @param replacer HomeDirectoryReplacer
+ * @returns {Promise<void>}
+ */
 const afterSavingUpdate = async (replacer) => {
     const status = await loadCurrentStatus();
     console.log('saved status');
     if (!status) return;
+    //if the Panel detected unlinked image, it warns.
+    if (status.param !== null && status.param.hasUnlinked) {
+        alertFromJSX('リンクの外れた画像があります。');
+    }
     console.log('saved update', status);
     await watcher.reSetImages(status.param.placeFullNames.map(img => replacer.replaceHomeDirectory(img)));
 }

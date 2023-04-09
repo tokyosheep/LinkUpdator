@@ -1003,15 +1003,12 @@ var checkUpdateImages = /*#__PURE__*/function () {
           _context.next = 17;
           return (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.switchPreview)();
         case 17:
-          //if the Panel detected unlinked image, it warns.
-          if (status.param !== null && status.param.hasUnlinked) {
-            (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.alertFromJSX)('リンクの外れた画像があります。');
-          }
           //begin to watch placed images.
           if (status.param !== null) {
             console.log('begin');
-            watcher.beginWatch(status.param.doc, status.param.placeFullNames);
+            watcher.beginWatch(status.param.placeFullNames);
           }
+          console.log(status.param !== null);
           _context.next = 25;
           break;
         case 21:
@@ -1029,6 +1026,12 @@ var checkUpdateImages = /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }();
+
+/**
+ * after saving document, update replaced items list
+ * @param replacer HomeDirectoryReplacer
+ * @returns {Promise<void>}
+ */
 var afterSavingUpdate = /*#__PURE__*/function () {
   var _ref2 = _babel_runtime_helpers_asyncToGenerator__WEBPACK_IMPORTED_MODULE_0___default()( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().mark(function _callee2(replacer) {
     var status;
@@ -1046,12 +1049,16 @@ var afterSavingUpdate = /*#__PURE__*/function () {
           }
           return _context2.abrupt("return");
         case 6:
+          //if the Panel detected unlinked image, it warns.
+          if (status.param !== null && status.param.hasUnlinked) {
+            (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.alertFromJSX)('リンクの外れた画像があります。');
+          }
           console.log('saved update', status);
-          _context2.next = 9;
+          _context2.next = 10;
           return watcher.reSetImages(status.param.placeFullNames.map(function (img) {
             return replacer.replaceHomeDirectory(img);
           }));
-        case 9:
+        case 10:
         case "end":
           return _context2.stop();
       }
@@ -1153,20 +1160,17 @@ __webpack_require__.r(__webpack_exports__);
 var Watcher = /*#__PURE__*/function () {
   function Watcher() {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Watcher);
-    _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "activeDoc", void 0);
     _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "images", void 0);
     _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_3___default()(this, "watcher", void 0);
-    this.activeDoc = null;
     this.images = [];
     this.watcher = null;
   }
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Watcher, [{
     key: "beginWatch",
-    value: function beginWatch(doc, images) {
+    value: function beginWatch(images) {
       this.images = images.map(function (img) {
         return (0,_fileSystem_resolveFile__WEBPACK_IMPORTED_MODULE_6__.analyzeJSXPath)(img);
       });
-      this.activeDoc = doc;
       console.log(/*#__PURE__*/ (chokidar__WEBPACK_IMPORTED_MODULE_5___namespace_cache || (chokidar__WEBPACK_IMPORTED_MODULE_5___namespace_cache = __webpack_require__.t(chokidar__WEBPACK_IMPORTED_MODULE_5__, 2))));
       this.watcher = chokidar__WEBPACK_IMPORTED_MODULE_5__.watch(this.images, {
         persistent: true,
