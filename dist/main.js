@@ -965,10 +965,11 @@ var checkUpdateImages = /*#__PURE__*/function () {
     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_1___default().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
+          _context.prev = 0;
           watcher.stopWatch();
-          _context.next = 3;
+          _context.next = 4;
           return (0,_fileSystem_loadPlaced__WEBPACK_IMPORTED_MODULE_4__.loadCurrentStatus)();
-        case 3:
+        case 4:
           status = _context.sent;
           // parse Path string. ExtendScript and Node.js differently deals with directory path.
           if (status) {
@@ -979,29 +980,29 @@ var checkUpdateImages = /*#__PURE__*/function () {
           }
           //if document unsaved any directory, it stops to inspect anymore.
           if (!(!status || !fs__WEBPACK_IMPORTED_MODULE_2___default().existsSync((0,_fileSystem_resolveFile__WEBPACK_IMPORTED_MODULE_6__.analyzeJSXPath)(status.param.doc)))) {
-            _context.next = 7;
+            _context.next = 8;
             break;
           }
           return _context.abrupt("return");
-        case 7:
+        case 8:
           _context.t0 = status.param !== null;
           if (!_context.t0) {
-            _context.next = 12;
+            _context.next = 13;
             break;
           }
-          _context.next = 11;
+          _context.next = 12;
           return (0,_fileSystem_checkUpdate__WEBPACK_IMPORTED_MODULE_5__.updateCheck)(status.param);
-        case 11:
-          _context.t0 = _context.sent;
         case 12:
+          _context.t0 = _context.sent;
+        case 13:
           if (!_context.t0) {
-            _context.next = 16;
+            _context.next = 17;
             break;
           }
           (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.alertFromJSX)('ドキュメント保存後に更新された画像があります。');
-          _context.next = 16;
+          _context.next = 17;
           return (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.switchPreview)();
-        case 16:
+        case 17:
           //if the Panel detected unlinked image, it warns.
           if (status.param !== null && status.param.hasUnlinked) {
             (0,_fileSystem_init__WEBPACK_IMPORTED_MODULE_3__.alertFromJSX)('リンクの外れた画像があります。');
@@ -1009,17 +1010,20 @@ var checkUpdateImages = /*#__PURE__*/function () {
           //begin to watch placed images.
           if (status.param !== null) {
             console.log('begin');
-            try {
-              watcher.beginWatch(status.param.doc, status.param.placeFullNames);
-            } catch (e) {
-              console.log(e);
-            }
+            watcher.beginWatch(status.param.doc, status.param.placeFullNames);
           }
-        case 18:
+          _context.next = 25;
+          break;
+        case 21:
+          _context.prev = 21;
+          _context.t1 = _context["catch"](0);
+          console.log('error update function');
+          console.log(_context.t1);
+        case 25:
         case "end":
           return _context.stop();
       }
-    }, _callee);
+    }, _callee, null, [[0, 21]]);
   }));
   return function checkUpdateImages(_x) {
     return _ref.apply(this, arguments);
