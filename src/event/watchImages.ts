@@ -15,6 +15,7 @@ export class Watcher {
     beginWatch (doc:string, images:string[]) {
         this.images = images.map(img => analyzeJSXPath(img));
         this.activeDoc = doc;
+        console.log(chokidar);
         this.watcher = chokidar.watch(this.images, {
           persistent: true,
           ignoreInitial: true,
