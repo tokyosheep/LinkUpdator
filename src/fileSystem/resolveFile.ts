@@ -69,6 +69,7 @@ export class HomeDirectoryReplacer {
     if (filePath.includes(this.myDocuments)) {
       filePath = filePath.replace(new RegExp(`^${this.myDocuments}`), dirMyDocuments);
     }
+    console.log(filePath);
     return resolveFilePath(filePath);
   }
 };

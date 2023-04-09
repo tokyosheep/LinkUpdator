@@ -1638,6 +1638,7 @@ var HomeDirectoryReplacer = /*#__PURE__*/function () {
       if (filePath.includes(this.myDocuments)) {
         filePath = filePath.replace(new RegExp("^".concat(this.myDocuments)), dirMyDocuments);
       }
+      console.log(filePath);
       return resolveFilePath(filePath);
     }
   }]);
