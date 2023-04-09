@@ -35,3 +35,5 @@ under production mode, it won't alert just switching preview mode.
 ### Note
 I tested several times but any case of accident , I can't have resposibility.
 please carefully use it in case you deal with your precious document.
+
+![capture](./readmeImg/linkupdator.gif)
