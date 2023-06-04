@@ -41,3 +41,7 @@ please carefully use it in case you deal with your precious document.
 this is still kind of beta version.
 
 ![capture](./readmeImg/linkupdator.gif)
+
+### Download zxp
+
+download from [here](https://kawano-shuji.com/strage/LinkUpdator.zxp)

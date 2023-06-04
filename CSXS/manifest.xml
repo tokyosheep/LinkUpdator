@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="9.0" ExtensionBundleId="LinkUpdator" ExtensionBundleVersion="1.0.0"
+<ExtensionManifest Version="9.0" ExtensionBundleId="LinkUpdator" ExtensionBundleVersion="1.1.0"
 		ExtensionBundleName="LinkUpdator" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ExtensionList>
-		<Extension Id="LinkUpdator" Version="1.0.0" />
+		<Extension Id="LinkUpdator" Version="1.1.0" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>

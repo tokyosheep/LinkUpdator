@@ -7,6 +7,16 @@ import { analyzeJSXPath, HomeDirectoryReplacer } from '../fileSystem/resolveFile
 
 import { Watcher } from './watchImages';
 
+const timeLag:(number:number)=>Promise<void> = (number) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, number);
+    })
+}
+
+type VisibleLayerFunc = (flag:boolean)=>void;
+
 const watcher = new Watcher();
 
 /**
@@ -17,7 +27,7 @@ const watcher = new Watcher();
  * the function updates watch and document status.
  * 
  */
-const checkUpdateImages:(replacer:HomeDirectoryReplacer)=>Promise<void> = async(replacer) => {
+const checkUpdateImages:(replacer:HomeDirectoryReplacer, visibleOverLayer:VisibleLayerFunc)=>Promise<void> = async(replacer, visibleOverLayer) => {
     try {
       watcher.stopWatch();
       const status = await loadCurrentStatus();
@@ -30,7 +40,11 @@ const checkUpdateImages:(replacer:HomeDirectoryReplacer)=>Promise<void> = async(
       if(!status || !fs.existsSync(analyzeJSXPath(status.param.doc))) return;
       if (status.param !== null && await updateCheck(status.param)) {
           alertFromJSX('ドキュメント保存後に更新された画像があります。');
+          visibleOverLayer(true);
+          await timeLag(100);
           await switchPreview();
+          await timeLag(2000);
+          visibleOverLayer(false);
       }
       //begin to watch placed images.
       if(status.param !== null) {
@@ -68,18 +82,18 @@ const afterSavingUpdate = async (replacer) => {
  * after panel's visibility, it adds event.
  * after panel's invisibility, it removes event. 
  */
-export const DocumentEvent = async (replacer:HomeDirectoryReplacer) => {
+export const DocumentEvent = async (replacer:HomeDirectoryReplacer, visibleOverLayer:VisibleLayerFunc) => {
     await init();
     await replacer.setHomeDirectory();
     csInterface.addEventListener('documentAfterSave', () => afterSavingUpdate(replacer));
-    csInterface.addEventListener('documentAfterActivate', () => checkUpdateImages(replacer));
+    csInterface.addEventListener('documentAfterActivate', () => checkUpdateImages(replacer, visibleOverLayer));
     csInterface.addEventListener('com.adobe.csxs.events.WindowVisibilityChanged', (e) => {
         if (!e.data) {
             watcher.stopWatch();
-            csInterface.removeEventListener('documentAfterActivate', () => checkUpdateImages(replacer));
+            csInterface.removeEventListener('documentAfterActivate', () => checkUpdateImages(replacer, visibleOverLayer));
             csInterface.addEventListener('documentAfterSave', () => afterSavingUpdate(replacer));
         } else {
-            csInterface.addEventListener('documentAfterActivate', () => checkUpdateImages(replacer));
+            csInterface.addEventListener('documentAfterActivate', () => checkUpdateImages(replacer, visibleOverLayer));
             csInterface.addEventListener('documentAfterSave', () => afterSavingUpdate(replacer));
         }
     });
